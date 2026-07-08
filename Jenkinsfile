@@ -1,10 +1,27 @@
 pipeline {
     agent any
 
+    tools {
+        sonarQube 'SonarScanner'
+    }
+
     stages {
-        stage('Test') {
+        stage('Checkout') {
             steps {
-                echo 'Jenkins is working!'
+                checkout scm
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    sonar-scanner \
+                      -Dsonar.projectKey=django-devsecops \
+                      -Dsonar.sources=. \
+                      -Dsonar.python.version=3
+                    '''
+                }
             }
         }
     }
