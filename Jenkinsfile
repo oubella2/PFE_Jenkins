@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        sonarQube 'SonarScanner'
+        sonarRunner 'SonarScanner'
     }
 
     stages {
@@ -16,10 +16,9 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                    sonar-scanner \
-                      -Dsonar.projectKey=django-devsecops \
-                      -Dsonar.sources=. \
-                      -Dsonar.python.version=3
+                        sonar-scanner \
+                        -Dsonar.projectKey=django-devsecops \
+                        -Dsonar.sources=.
                     '''
                 }
             }
