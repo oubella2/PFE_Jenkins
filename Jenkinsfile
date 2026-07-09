@@ -10,20 +10,23 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarScanner'
+    steps {
+        script {
+            def scannerHome = tool 'SonarScanner'
 
-                    withSonarQubeEnv('SonarQube') {
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=django-devsecops \
-                            -Dsonar.sources=.
-                        """
-                    }
+            withSonarQubeEnv('SonarQube') {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=django-devsecops \
+                        -Dsonar.sources=. \
+                        -Dsonar.login=$SONAR_TOKEN
+                    """
                 }
             }
         }
+    }
+}
 
         stage('Build Docker Image') {
             steps {
