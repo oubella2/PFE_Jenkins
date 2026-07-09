@@ -1,7 +1,8 @@
 pipeline {
     agent any
- 
+
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -17,6 +18,20 @@ pipeline {
                         -Dsonar.sources=.
                     '''
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t django-devsecops:latest .'
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                    trivy image --severity HIGH,CRITICAL --exit-code 0 django-devsecops:latest
+                '''
             }
         }
     }
