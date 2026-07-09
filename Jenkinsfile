@@ -11,12 +11,16 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=django-devsecops \
-                        -Dsonar.sources=.
-                    '''
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=django-devsecops \
+                            -Dsonar.sources=.
+                        """
+                    }
                 }
             }
         }
@@ -29,9 +33,7 @@ pipeline {
 
         stage('Trivy Scan') {
             steps {
-                sh '''
-                    trivy image --severity HIGH,CRITICAL --exit-code 0 django-devsecops:latest
-                '''
+                sh 'trivy image --severity HIGH,CRITICAL --exit-code 0 django-devsecops:latest'
             }
         }
     }
